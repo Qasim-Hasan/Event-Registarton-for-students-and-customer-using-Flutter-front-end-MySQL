@@ -1,0 +1,125 @@
+// Sql commands
+
+-- Create Admin Table
+CREATE TABLE Admin (
+    admin_id int PRIMARY KEY,
+    admin_username varchar(100) NOT NULL,
+    admin_password varchar(255) NOT NULL
+);
+
+insert into admin values(1234,'admin','admin@devcom');
+
+-- Create Leader (User Account) Table
+CREATE TABLE Leader (
+    student_id varchar(10) PRIMARY KEY,
+    password varchar(255) NOT NULL UNIQUE,
+    full_name varchar(100) NOT NULL,
+    department varchar(50) NOT NULL,
+    phone_number varchar(15) NOT NULL UNIQUE,
+    email varchar(255) NOT NULL UNIQUE,
+    batch_id int
+);
+ALTER TABLE Leader
+modify status int DEFAULT 0;
+
+select status from leader;
+UPDATE Leader
+SET status = 0
+WHERE batch_id = 22;
+
+
+
+ALTER TABLE Leader ADD (
+    CONSTRAINT dep_fk FOREIGN KEY (department) REFERENCES department(department_id),
+    CONSTRAINT batch_fk FOREIGN KEY (batch_id) REFERENCES Batch(batch_id)
+);
+
+-- Create Batch Table
+CREATE TABLE Batch (
+    batch_id int PRIMARY KEY,
+    batch_year int NOT NULL
+);
+
+
+insert into Batch values(19,2019);
+insert into Batch values(20,2020);
+insert into Batch values(21,2021);
+insert into Batch values(22,2022);
+insert into Batch values(23,2023);
+-- Create Department Table
+CREATE TABLE department (
+    department_id varchar(50) PRIMARY KEY,
+    department_name varchar(50) NOT NULL
+);
+
+Insert into department values('CS', 'Computer Science');
+Insert into department values('AI', 'Artificial Inteligence');
+Insert into department values('CYS', 'Cyber Security');
+Insert into department values('Rob', 'Robotics');
+Insert into department values('SE', 'Software Engineering');
+Insert into department values('EE', 'Electrical Engineering');
+-- Create Group Member Table
+CREATE TABLE GroupMember (
+    group_member_id varchar(10) PRIMARY KEY,
+    leader_id varchar(10) NOT NULL unique,
+    department varchar(50) NOT NULL,
+     batch_id int
+);
+
+
+INSERT INTO GroupMember (group_member_id, leader_id, department, batch_id) VALUES (UPPER('21k-1234'), UPPER('21k-3355'), UPPER('cs'), 21),(UPPER('21k-3456'), UPPER('21k-3355'), UPPER('se'), '22');
+
+ALTER TABLE GroupMember ADD (
+    CONSTRAINT leader_fk_Groupmember FOREIGN KEY (leader_id) REFERENCES Leader(student_id),
+    CONSTRAINT dep_fk_groupmember FOREIGN KEY (department) REFERENCES department(department_id),
+    CONSTRAINT batch_fk_groupmember FOREIGN KEY (batch_id) REFERENCES Batch(batch_id)
+);
+
+-- Create Event Table
+CREATE TABLE Event (
+    event_id int PRIMARY KEY,
+    event_name varchar(100) NOT NULL,
+    admin_id int,  -- Reference to the admin responsible for the event
+    CONSTRAINT admin_fk_event FOREIGN KEY (admin_id) REFERENCES Admin(admin_id)
+);
+
+insert into event (event_id,event_name,admin_id)
+	values (1,'Code In Dark',1234),
+				(2,'Hackathon',1234),
+				(3,'Speed Programing',1234),
+				(4,'Web Development',1234),
+				(5,'App Development',1234),
+				(6,'EA Gaming',1234);
+
+
+-- Create UserEventSelection Table (Many-to-Many Relationship between Leader and Event)
+CREATE TABLE UserEventSelection (
+    leader_id varchar(10) NOT NULL,
+    event_id int NOT NULL,
+    PRIMARY KEY (leader_id, event_id)
+);
+
+ALTER TABLE UserEventSelection ADD (
+    CONSTRAINT leader_fk_event FOREIGN KEY (leader_id) REFERENCES Leader(student_id),
+    CONSTRAINT event_fk FOREIGN KEY (event_id) REFERENCES Event(event_id)
+);
+
+-- Create Message Table (Between Leader and Admin)
+CREATE TABLE Message (
+    message_id int PRIMARY KEY,
+    leader_id varchar(10) NOT NULL,
+    admin_id int NOT NULL,
+    message_text varchar(500) NOT NULL
+);
+
+ALTER TABLE Message ADD (
+    CONSTRAINT leader_fk_message FOREIGN KEY (leader_id) REFERENCES Leader(student_id),
+    CONSTRAINT admin_fk_message FOREIGN KEY (admin_id) REFERENCES Admin(admin_id)
+);
+
+
+select* from usereventselection;
+select *from leader;
+select* from event;
+select *from admin;
+select *from groupmember;
